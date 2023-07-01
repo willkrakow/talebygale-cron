@@ -13,7 +13,10 @@ async function main() {
         console.log("Removed links: ", removedLinks);
         // Remove query params from links
         const shortLinks = removedLinks.map(link => link.split("?")[0]);
+        await sendText(`Removed links ${shortLinks.length}: ${shortLinks.join(", ")}`, process.env.LAURA_PHONE_NUMBER!);
         await sendText(`Removed links ${shortLinks.length}: ${shortLinks.join(", ")}`, process.env.MY_PHONE_NUMBER!);
+    } else {
+        await sendText("No links removed.", process.env.MY_PHONE_NUMBER!);
     }
 }
 
