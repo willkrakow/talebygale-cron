@@ -21,7 +21,7 @@ const contentAPI = new GhostContentAPI({
     version: "v5.0",
 });
 
-export async function checkForExpiredPostLinks() {
+export async function removeExpiredPostLinks() {
     const posts = await contentAPI.posts.browse({ limit: 1000, include: "tags" });
     const adminPosts = await adminAPI.posts.browse({ limit: 1000, include: "tags" });
     const publishedPostIds = adminPosts
@@ -31,6 +31,7 @@ export async function checkForExpiredPostLinks() {
     const jobBoardPublishedPosts = posts
         .filter(p => Array.isArray(p.tags) && p.tags.some(t => t.slug === REMOTE_JOBS))
         .filter(p => publishedPostIds.includes(p.id))
+    let removedLinks: string[] = [];
 
     for await (const post of jobBoardPublishedPosts) {
         if (!post.html) {
@@ -57,15 +58,20 @@ export async function checkForExpiredPostLinks() {
                 console.count(BAD_LINKS);
                 console.log("Link is bad", link.href);
                 await unpublishPost(adminPost);
+                removedLinks.push(link.href);
                 continue;
             }
         } catch (e) {
             console.count(BAD_LINKS);
             console.error("Error getting link", link.href);
             await unpublishPost(adminPost);
+            removedLinks.push(link.href);
             continue;
         }
     }
+
+    console.log("Removed links", removedLinks);
+    return removedLinks;
 }
 
 
