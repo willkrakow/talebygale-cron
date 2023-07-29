@@ -1,4 +1,9 @@
 import Twilio from 'twilio';
+import dotenv from 'dotenv';
+
+dotenv.config({
+    path: ".env"
+});
 
 const twilio = Twilio(process.env.TWILIO_ACCOUNT_SID!, process.env.TWILIO_AUTH_TOKEN!);
 
@@ -9,5 +14,5 @@ export async function sendText(body: string, to: string = process.env.LAURA_PHON
         from: process.env.TWILIO_PHONE_NUMBER!,
     });
 
-    message.status === "accepted" ? console.log("Text message sent.") : console.error("Error sending text message.");
+    console.log(`Text message ${message.status}`);
 }
